@@ -20,10 +20,12 @@ int main (int argc, char *argv[]) {
     if (n == 0) {
         n = 1;
     }
+    int proc_limit = 5;
     int proc_count = 0;                // Number of concurrent children
-    pid_t childpid;
+    pid_t childpids[proc_limit];
+    int num_procs_spawned = 0;
 
-    struct msgbuf sbuf = {.mtype = 1, .clock.seconds = 200, .clock.nanoseconds = 100};
+    struct msgbuf sbuf = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
 
     // need total processes generated
     // need total time elapsed (timer)
@@ -35,15 +37,15 @@ int main (int argc, char *argv[]) {
     execv_arr[EXECV_SIZE - 1] = NULL;
 
     int i;
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < proc_limit; i++) {
 
-        if (proc_count == 10) {
+        if (proc_count == proc_limit) {
             // Wait for one child to finish and decrement proc_count
             wait(NULL);
             proc_count -= 1;
         }
 
-        if ((childpid = fork()) == 0) {
+        if ((childpids[i] = fork()) == 0) {
             // Child so...
             char msgq_id[10];
             sprintf(msgq_id, "%d", msgqid);
@@ -55,28 +57,30 @@ int main (int argc, char *argv[]) {
             return 1;
         }
 
-        if (childpid == -1) {
+        if (childpids[i] == -1) {
             perror("Child failed to fork!\n");
             return 1;
         }
 
-        proc_count += 1; // increment because we forked
+        // Increment because we forked
+        proc_count += 1;
+        num_procs_spawned += 1;
 
         if (waitpid(-1, NULL, WNOHANG) > 0) {
             // A child has finished executing
             proc_count -= 1;
         }
 
-    }
+        if (msgsnd(msgqid, &sbuf, sizeof(sbuf.clock), IPC_NOWAIT) < 0) {
+            printf("%d, %ld, %d:%d, %lu\n", msgqid, sbuf.mtype, sbuf.clock.seconds, sbuf.clock.nanoseconds, sizeof(sbuf.clock));
+            perror("msgsnd");
+            exit(1);
+        }
+       else {
+           printf("oss : wrote to clock: %d:%d \n", sbuf.clock.seconds, sbuf.clock.nanoseconds);
+       }
 
-    if (msgsnd(msgqid, &sbuf, sizeof(sbuf.clock), IPC_NOWAIT) < 0) {
-        printf("%d, %ld, %d:%d, %lu\n", msgqid, sbuf.mtype, sbuf.clock.seconds, sbuf.clock.nanoseconds, sizeof(sbuf.clock));
-        perror("msgsnd");
-        exit(1);
     }
-   else {
-       printf("oss : wrote to clock: %d:%d \n", sbuf.clock.seconds, sbuf.clock.nanoseconds);
-   }
 
     sleep(1);
 
