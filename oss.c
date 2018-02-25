@@ -16,6 +16,7 @@ void wait_for_all_children();
 char* get_msgqid(int msgqid);
 void add_signal_handlers();
 void handle_sigint(int sig);
+void cleanup_and_exit();
 
 // Globals used in signal handler
 int msgqid;
@@ -93,8 +94,7 @@ int main (int argc, char *argv[]) {
 
     sleep(5);
 
-    // Remove message queue
-    remove_message_queue(msgqid);
+    cleanup_and_exit();
 
     return 0;
 
@@ -131,6 +131,11 @@ void add_signal_handlers() {
 
 void handle_sigint(int sig) {
     printf("\nCaught signal %d\n", sig);
+    cleanup_and_exit();
+}
+
+void cleanup_and_exit() {
+    terminate_children();
     remove_message_queue(msgqid);
     exit(0);
 }
