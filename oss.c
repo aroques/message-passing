@@ -23,15 +23,7 @@ int main (int argc, char *argv[]) {
     int proc_count = 0;                // Number of concurrent children
     pid_t childpid;
 
-    struct msgbuf sbuf;
-    sbuf.mtype = 1;
-    //strcpy(sbuf.mtext, "did you get this?");
-//    struct clock clock;
-//    clock.seconds = 100;
-//    clock.nanoseconds = 200;
-
-    sbuf.clock.seconds = 200;
-    sbuf.clock.nanoseconds = 22300;
+    struct msgbuf sbuf = {.mtype = 1, .clock.seconds = 200, .clock.nanoseconds = 100};
 
     // need total processes generated
     // need total time elapsed (timer)
@@ -79,17 +71,18 @@ int main (int argc, char *argv[]) {
     }
 
     if (msgsnd(qid, &sbuf, sizeof(sbuf.clock), IPC_NOWAIT) < 0) {
-        printf("%d, %ld, %d, %lu\n", qid, sbuf.mtype, sbuf.clock.seconds, sizeof(sbuf.clock));
+        printf("%d, %ld, %d:%d, %lu\n", qid, sbuf.mtype, sbuf.clock.seconds, sbuf.clock.nanoseconds, sizeof(sbuf.clock));
         perror("msgsnd");
         exit(1);
     }
    else {
-       printf("Message: \"%d\" Sent\n", sbuf.clock.seconds);
+       printf("oss: wrote to clock: %d:%d \n", sbuf.clock.seconds, sbuf.clock.nanoseconds);
    }
 
 
     sleep(1);
 
+    // Destroy message queue
     msgctl(qid, IPC_RMID, NULL);
     return 0;
 

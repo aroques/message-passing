@@ -32,7 +32,7 @@ int main (int argc, char *argv[]) {
      * Print the answer.
      */
     printf("user: received msg\n");
-    printf("user: msg rcv: %d\n", rbuf.clock.seconds);
+    printf("user: msg rcv: %d:%d\n", rbuf.clock.seconds, rbuf.clock.nanoseconds);
 
     // Need access to shared clock
 
