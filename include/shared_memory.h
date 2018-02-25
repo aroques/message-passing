@@ -9,7 +9,7 @@ struct clock {
 };
 
 struct msgbuf {
-    int mtype;
+    long mtype;
     char mtext[MSGSZ];
 };
 

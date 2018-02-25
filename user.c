@@ -30,15 +30,15 @@ int main (int argc, char *argv[]) {
 
     printf("user: qid: %d\n", qid);
     printf("user: waiting to rcv\n");
-    if (msgrcv(qid, &rbuf, sizeof(rbuf), 1, 0) < 0) {
-        perror("user: msgrcv\n");
+    if (msgrcv(qid, &rbuf, sizeof(rbuf.mtext), 1, 0) < 0) {
+        perror("user: msgrcv");
         exit(1);
     }
 
     /*
      * Print the answer.
      */
-    printf("user: test\n");
+    printf("user: received msg\n");
     printf("user: msg rcv: %s\n", rbuf.mtext);
 
     // Need access to shared clock

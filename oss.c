@@ -76,14 +76,15 @@ int main (int argc, char *argv[]) {
 
         if (waitpid(-1, NULL, WNOHANG) > 0) {
             // A child has finished executing
+            printf("child finished\n");
             proc_count -= 1;
         }
         sleep(1);
 
     }
 
-    if (msgsnd(qid, &sbuf, sizeof(sbuf), IPC_NOWAIT) < 0) {
-        printf("%d, %d, %s, %d\n", qid, sbuf.mtype, sbuf.mtext, MSGSZ);
+    if (msgsnd(qid, &sbuf, sizeof(sbuf.mtext), IPC_NOWAIT) < 0) {
+        printf("%d, %ld, %s, %d\n", qid, sbuf.mtype, sbuf.mtext, MSGSZ);
         perror("msgsnd");
         exit(1);
     }
@@ -93,6 +94,8 @@ int main (int argc, char *argv[]) {
 
 
     sleep(1);
+
+    msgctl(qid, IPC_RMID, NULL);
     return 0;
 
 }
