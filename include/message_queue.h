@@ -1,5 +1,5 @@
-#ifndef SHARED_MEMORY_H
-#define SHARED_MEMORY_H
+#ifndef MEESAGE_QUEUE_H
+#define MESSAGE_QUEUE_H
 
 struct clock {
     int seconds;
