@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <unistd.h>
 
 #include "global_constants.h"
 #include "helpers.h"
@@ -29,7 +30,7 @@ int main (int argc, char *argv[]) {
 
 
     printf("user: read clock: %d:%d\n", rbuf.clock.seconds, rbuf.clock.nanoseconds);
-
+    sleep(3);
     return 0;  
 }
 
