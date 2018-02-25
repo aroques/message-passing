@@ -14,8 +14,14 @@
 
 void wait_for_all_children();
 char* get_msgqid(int msgqid);
+void handle_sigint(int sig);
+
+// Globals used in signal handler
+int msgqid;
 
 int main (int argc, char *argv[]) {
+    signal(SIGINT, handle_sigint);
+
     int n = parse_cmd_line_args(argc, argv);
     if (n == 0) {
         n = 1;
@@ -30,7 +36,7 @@ int main (int argc, char *argv[]) {
     // need total processes generated
     // need total time elapsed (timer)
 
-    int msgqid = get_message_queue();
+    msgqid = get_message_queue();
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
@@ -82,10 +88,10 @@ int main (int argc, char *argv[]) {
 
     }
 
-    sleep(1);
+    sleep(5);
 
-    // Destroy message queue
-    msgctl(msgqid, IPC_RMID, NULL);
+    // Remove message queue
+    remove_message_queue(msgqid);
 
     return 0;
 
@@ -96,4 +102,11 @@ void wait_for_all_children() {
     while  ( (childpid = wait(NULL) ) > 0) {
         printf("Child exited. pid: %d\n", childpid);
     }
+}
+
+void handle_sigint(int sig) {
+    printf("\nCaught signal %d\n", sig);
+    printf("msgqid: %d\n", msgqid);
+    remove_message_queue(msgqid);
+    exit(0);
 }

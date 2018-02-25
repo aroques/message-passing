@@ -12,5 +12,6 @@ struct msgbuf {
 };
 
 int get_message_queue();
+void remove_message_queue(int msgqid);
 
 #endif

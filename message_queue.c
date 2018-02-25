@@ -19,3 +19,10 @@ int get_message_queue() {
     return qid;
 }
 
+void remove_message_queue(int msgqid) {
+    if (msgctl(msgqid, IPC_RMID, NULL) == -1) {
+        perror("msgctl");
+        exit(1);
+    }
+}
+
