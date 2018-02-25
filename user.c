@@ -19,14 +19,7 @@ int main (int argc, char *argv[]) {
 
     printf("duration %d!\n", duration);
 
-    key_t key = 1234;
-    int qid;
-    printf("user: key: %d\n", key);
-
-    if ((qid = msgget(key, IPC_CREAT | 0666)) < 0) {
-        perror("user: msgget\n");
-        exit(1);
-    }
+    int qid = atoi(argv[QID_IDX]);
 
     printf("user: qid: %d\n", qid);
     printf("user: waiting to rcv\n");

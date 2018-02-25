@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
 
     //int qid = get_shared_memory(key);
 
-    int qid = msgget(key, IPC_CREAT | 0666);
+    int qid = get_shared_memory(key);
 
     if (qid == -1) {
         perror("msgget");
@@ -57,9 +57,9 @@ int main (int argc, char *argv[]) {
 
         if ((childpid = fork()) == 0) {
             // Child so...
-            //char queue_id[3];
-            //sprintf(queue_id, "%d", key);
-            //execv_arr[QID_IDX] = queue_id;
+            char queue_id[3];
+            sprintf(queue_id, "%d", qid);
+            execv_arr[QID_IDX] = queue_id;
 
             execvp(execv_arr[0], execv_arr);
 
@@ -106,9 +106,3 @@ void wait_for_all_children() {
         printf("Child exited. pid: %d\n", childpid);
     }
 }
-
-//char* get_qid(int qid) {
-//    char* queue_id = malloc(sizeof(char)*3);
-//    sprintf(queue_id, "%d", (qid));
-//    return queue_id;
-//}
