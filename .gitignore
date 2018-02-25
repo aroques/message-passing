@@ -1,4 +1,5 @@
 *.o
 *.log
 user
-oss.project
+oss
+.project
