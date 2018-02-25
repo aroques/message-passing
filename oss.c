@@ -2,11 +2,18 @@
 #include <sys/wait.h>
 #include <getopt.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <string.h>
 
 #include "global_constants.h"
 #include "helpers.h"
+#include "shared_memory.h"
 
 void wait_for_all_children();
+char* get_qid(int qid);
 
 int main (int argc, char *argv[]) {
     int n = parse_cmd_line_args(argc, argv);
@@ -15,8 +22,26 @@ int main (int argc, char *argv[]) {
     }
     int proc_count = 0;                // Number of concurrent children
     pid_t childpid;
+    key_t key = 1234;
+
+    struct msgbuf sbuf;
+    sbuf.mtype = 1;
+    strcpy(sbuf.mtext, "did you get this?");
+
+
     // need total processes generated
     // need total time elapsed (timer)
+
+    //int qid = get_shared_memory(key);
+
+    int qid = msgget(key, IPC_CREAT | 0666);
+
+    if (qid == -1) {
+        perror("msgget");
+        exit(1);
+    }
+
+
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
@@ -35,6 +60,8 @@ int main (int argc, char *argv[]) {
 
         if ((childpid = fork()) == 0) {
             // Child so...
+            char* queue_id = get_qid(key);
+            execv_arr[QID_IDX] = queue_id;
 
             execvp(execv_arr[0], execv_arr);
 
@@ -57,6 +84,17 @@ int main (int argc, char *argv[]) {
 
     }
 
+    if (msgsnd(qid, &sbuf, MSGSZ+1, IPC_NOWAIT) < 0) {
+        printf("%d, %d, %s, %d\n", qid, sbuf.mtype, sbuf.mtext, MSGSZ);
+        perror("msgsnd");
+        exit(1);
+    }
+   else {
+       printf("Message: \"%s\" Sent\n", sbuf.mtext);
+   }
+
+
+    sleep(1);
     return 0;
 
 }
@@ -66,4 +104,10 @@ void wait_for_all_children() {
     while  ( (childpid = wait(NULL) ) > 0) {
         printf("Child exited. pid: %d\n", childpid);
     }
+}
+
+char* get_qid(int qid) {
+    char* queue_id = malloc(sizeof(char)*3);
+    sprintf(queue_id, "%d", (qid));
+    return queue_id;
 }
