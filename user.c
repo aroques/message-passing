@@ -23,7 +23,7 @@ int main (int argc, char *argv[]) {
 
     printf("user: qid: %d\n", qid);
     printf("user: waiting to rcv\n");
-    if (msgrcv(qid, &rbuf, sizeof(rbuf.mtext), 1, 0) < 0) {
+    if (msgrcv(qid, &rbuf, sizeof(rbuf.clock), 1, 0) < 0) {
         perror("user: msgrcv");
         exit(1);
     }
@@ -32,7 +32,7 @@ int main (int argc, char *argv[]) {
      * Print the answer.
      */
     printf("user: received msg\n");
-    printf("user: msg rcv: %s\n", rbuf.mtext);
+    printf("user: msg rcv: %d\n", rbuf.clock.seconds);
 
     // Need access to shared clock
 

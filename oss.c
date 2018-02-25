@@ -25,7 +25,13 @@ int main (int argc, char *argv[]) {
 
     struct msgbuf sbuf;
     sbuf.mtype = 1;
-    strcpy(sbuf.mtext, "did you get this?");
+    //strcpy(sbuf.mtext, "did you get this?");
+//    struct clock clock;
+//    clock.seconds = 100;
+//    clock.nanoseconds = 200;
+
+    sbuf.clock.seconds = 200;
+    sbuf.clock.nanoseconds = 22300;
 
     // need total processes generated
     // need total time elapsed (timer)
@@ -72,13 +78,13 @@ int main (int argc, char *argv[]) {
 
     }
 
-    if (msgsnd(qid, &sbuf, sizeof(sbuf.mtext), IPC_NOWAIT) < 0) {
-        printf("%d, %ld, %s, %d\n", qid, sbuf.mtype, sbuf.mtext, MSGSZ);
+    if (msgsnd(qid, &sbuf, sizeof(sbuf.clock), IPC_NOWAIT) < 0) {
+        printf("%d, %ld, %d, %lu\n", qid, sbuf.mtype, sbuf.clock.seconds, sizeof(sbuf.clock));
         perror("msgsnd");
         exit(1);
     }
    else {
-       printf("Message: \"%s\" Sent\n", sbuf.mtext);
+       printf("Message: \"%d\" Sent\n", sbuf.clock.seconds);
    }
 
 

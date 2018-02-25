@@ -10,7 +10,8 @@ struct clock {
 
 struct msgbuf {
     long mtype;
-    char mtext[MSGSZ];
+    //char mtext[MSGSZ];
+    struct clock clock;
 };
 
 int get_shared_memory();
