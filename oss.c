@@ -14,13 +14,15 @@
 
 void wait_for_all_children();
 char* get_msgqid(int msgqid);
+void add_signal_handlers();
 void handle_sigint(int sig);
 
 // Globals used in signal handler
 int msgqid;
 
 int main (int argc, char *argv[]) {
-    signal(SIGINT, handle_sigint);
+
+    add_signal_handlers();
 
     int n = parse_cmd_line_args(argc, argv);
     if (n == 0) {
@@ -104,9 +106,19 @@ void wait_for_all_children() {
     }
 }
 
+void add_signal_handlers() {
+    struct sigaction act;
+    act.sa_handler = handle_sigint; // Signal handler
+    sigemptyset(&act.sa_mask);      // No other signals should be blocked
+    act.sa_flags = 0;               // 0 so do nothing
+    if (sigaction(SIGINT, &act, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
+}
+
 void handle_sigint(int sig) {
     printf("\nCaught signal %d\n", sig);
-    printf("msgqid: %d\n", msgqid);
     remove_message_queue(msgqid);
     exit(0);
 }
