@@ -19,20 +19,16 @@ int main (int argc, char *argv[]) {
 
     printf("user: duration: %d\n", duration);
 
-    int qid = atoi(argv[QID_IDX]);
+    int msgq_id = atoi(argv[MSGQ_ID_IDX]);
 
     printf("user: waiting to rcv msg\n");
-    if (msgrcv(qid, &rbuf, sizeof(rbuf.clock), 1, 0) < 0) {
+    if (msgrcv(msgq_id, &rbuf, sizeof(rbuf.clock), 1, 0) < 0) {
         perror("user: msgrcv");
         exit(1);
     }
 
-    /*
-     * Print the answer.
-     */
-    printf("user: read clock: %d:%d\n", rbuf.clock.seconds, rbuf.clock.nanoseconds);
 
-    // Need access to shared clock
+    printf("user: read clock: %d:%d\n", rbuf.clock.seconds, rbuf.clock.nanoseconds);
 
     return 0;  
 }

@@ -1,8 +1,6 @@
 #ifndef SHARED_MEMORY_H
 #define SHARED_MEMORY_H
 
-#define MSGSZ 60
-
 struct clock {
     int seconds;
     int nanoseconds;
@@ -10,7 +8,6 @@ struct clock {
 
 struct msgbuf {
     long mtype;
-    //char mtext[MSGSZ];
     struct clock clock;
 };
 

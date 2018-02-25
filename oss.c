@@ -13,7 +13,7 @@
 #include "shared_memory.h"
 
 void wait_for_all_children();
-char* get_qid(int qid);
+char* get_msgqid(int msgqid);
 
 int main (int argc, char *argv[]) {
     int n = parse_cmd_line_args(argc, argv);
@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
     // need total processes generated
     // need total time elapsed (timer)
 
-    int qid = get_shared_memory();
+    int msgqid = get_shared_memory();
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
@@ -45,9 +45,9 @@ int main (int argc, char *argv[]) {
 
         if ((childpid = fork()) == 0) {
             // Child so...
-            char queue_id[3];
-            sprintf(queue_id, "%d", qid);
-            execv_arr[QID_IDX] = queue_id;
+            char msgq_id[10];
+            sprintf(msgq_id, "%d", msgqid);
+            execv_arr[MSGQ_ID_IDX] = msgq_id;
 
             execvp(execv_arr[0], execv_arr);
 
@@ -64,25 +64,24 @@ int main (int argc, char *argv[]) {
 
         if (waitpid(-1, NULL, WNOHANG) > 0) {
             // A child has finished executing
-            printf("child finished\n");
             proc_count -= 1;
         }
 
     }
 
-    if (msgsnd(qid, &sbuf, sizeof(sbuf.clock), IPC_NOWAIT) < 0) {
-        printf("%d, %ld, %d:%d, %lu\n", qid, sbuf.mtype, sbuf.clock.seconds, sbuf.clock.nanoseconds, sizeof(sbuf.clock));
+    if (msgsnd(msgqid, &sbuf, sizeof(sbuf.clock), IPC_NOWAIT) < 0) {
+        printf("%d, %ld, %d:%d, %lu\n", msgqid, sbuf.mtype, sbuf.clock.seconds, sbuf.clock.nanoseconds, sizeof(sbuf.clock));
         perror("msgsnd");
         exit(1);
     }
    else {
-       printf("oss: wrote to clock: %d:%d \n", sbuf.clock.seconds, sbuf.clock.nanoseconds);
+       printf("oss : wrote to clock: %d:%d \n", sbuf.clock.seconds, sbuf.clock.nanoseconds);
    }
 
     sleep(1);
 
     // Destroy message queue
-    msgctl(qid, IPC_RMID, NULL);
+    msgctl(msgqid, IPC_RMID, NULL);
 
     return 0;
 
