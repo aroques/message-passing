@@ -16,28 +16,30 @@ int main (int argc, char *argv[]) {
    
     struct msgbuf rbuf;
     int duration = get_duration();
-    printf("hello world!\n");
+
     printf("duration %d!\n", duration);
+
     key_t key = 1234;
     int qid;
-    printf("key: %d\n", key);
+    printf("user: key: %d\n", key);
 
     if ((qid = msgget(key, IPC_CREAT | 0666)) < 0) {
-        perror("msgget\n");
+        perror("user: msgget\n");
         exit(1);
     }
 
-    printf("waiting to rcv\n");
-    if (msgrcv(qid, &rbuf, MSGSZ, 1, 0) < 0) {
-        perror("msgrcv\n");
+    printf("user: qid: %d\n", qid);
+    printf("user: waiting to rcv\n");
+    if (msgrcv(qid, &rbuf, sizeof(rbuf), 1, 0) < 0) {
+        perror("user: msgrcv\n");
         exit(1);
     }
 
     /*
      * Print the answer.
      */
-    printf("test\n");
-    printf("msg rcv: %s\n", rbuf.mtext);
+    printf("user: test\n");
+    printf("user: msg rcv: %s\n", rbuf.mtext);
 
     // Need access to shared clock
 

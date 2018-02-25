@@ -28,7 +28,6 @@ int main (int argc, char *argv[]) {
     sbuf.mtype = 1;
     strcpy(sbuf.mtext, "did you get this?");
 
-
     // need total processes generated
     // need total time elapsed (timer)
 
@@ -41,16 +40,14 @@ int main (int argc, char *argv[]) {
         exit(1);
     }
 
-
+    printf("oss: qid: %d\n", qid);
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
     execv_arr[EXECV_SIZE - 1] = NULL;
 
-    // Allocate shared memory for a clock (enforce CS w/ message queues)
-    // Clock - 2 integers, seconds, nanoseconds and start at 0:0
-
-    for (int i = 0; i < n; i++) { 
+    int i;
+    for (i = 0; i < n; i++) {
 
         if (proc_count == 10) {
             // Wait for one child to finish and decrement proc_count
@@ -60,8 +57,9 @@ int main (int argc, char *argv[]) {
 
         if ((childpid = fork()) == 0) {
             // Child so...
-            char* queue_id = get_qid(key);
-            execv_arr[QID_IDX] = queue_id;
+            //char queue_id[3];
+            //sprintf(queue_id, "%d", key);
+            //execv_arr[QID_IDX] = queue_id;
 
             execvp(execv_arr[0], execv_arr);
 
@@ -84,7 +82,7 @@ int main (int argc, char *argv[]) {
 
     }
 
-    if (msgsnd(qid, &sbuf, MSGSZ+1, IPC_NOWAIT) < 0) {
+    if (msgsnd(qid, &sbuf, sizeof(sbuf), IPC_NOWAIT) < 0) {
         printf("%d, %d, %s, %d\n", qid, sbuf.mtype, sbuf.mtext, MSGSZ);
         perror("msgsnd");
         exit(1);
@@ -106,8 +104,8 @@ void wait_for_all_children() {
     }
 }
 
-char* get_qid(int qid) {
-    char* queue_id = malloc(sizeof(char)*3);
-    sprintf(queue_id, "%d", (qid));
-    return queue_id;
-}
+//char* get_qid(int qid) {
+//    char* queue_id = malloc(sizeof(char)*3);
+//    sprintf(queue_id, "%d", (qid));
+//    return queue_id;
+//}

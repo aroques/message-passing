@@ -53,7 +53,6 @@ int parse_cmd_line_args(int argc, char* argv[]) {
         default:
             print_usage();
     }
-    printf("n: %d\n", n);
     return n;
 }
 
