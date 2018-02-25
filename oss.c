@@ -30,16 +30,7 @@ int main (int argc, char *argv[]) {
     // need total processes generated
     // need total time elapsed (timer)
 
-    //int qid = get_shared_memory(key);
-
     int qid = get_shared_memory();
-
-    if (qid == -1) {
-        perror("msgget");
-        exit(1);
-    }
-
-    printf("oss: qid: %d\n", qid);
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
@@ -78,7 +69,6 @@ int main (int argc, char *argv[]) {
             printf("child finished\n");
             proc_count -= 1;
         }
-        sleep(1);
 
     }
 
