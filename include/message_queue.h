@@ -11,6 +11,6 @@ struct msgbuf {
     struct clock clock;
 };
 
-int get_shared_memory();
+int get_message_queue();
 
 #endif

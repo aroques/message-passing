@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "shared_memory.h"
+#include "message_queue.h"
 
-int get_shared_memory() {
+int get_message_queue() {
     int qid;
 
     qid = msgget(IPC_PRIVATE, IPC_CREAT | 0666);

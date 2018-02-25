@@ -10,7 +10,7 @@
 
 #include "global_constants.h"
 #include "helpers.h"
-#include "shared_memory.h"
+#include "message_queue.h"
 
 void wait_for_all_children();
 char* get_msgqid(int msgqid);
@@ -30,7 +30,7 @@ int main (int argc, char *argv[]) {
     // need total processes generated
     // need total time elapsed (timer)
 
-    int msgqid = get_shared_memory();
+    int msgqid = get_message_queue();
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";

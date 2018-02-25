@@ -7,7 +7,7 @@
 
 #include "global_constants.h"
 #include "helpers.h"
-#include "shared_memory.h"
+#include "message_queue.h"
 
 int get_duration();
 
