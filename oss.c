@@ -79,11 +79,11 @@ int main (int argc, char *argv[]) {
        printf("oss: wrote to clock: %d:%d \n", sbuf.clock.seconds, sbuf.clock.nanoseconds);
    }
 
-
     sleep(1);
 
     // Destroy message queue
     msgctl(qid, IPC_RMID, NULL);
+
     return 0;
 
 }

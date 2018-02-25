@@ -17,12 +17,11 @@ int main (int argc, char *argv[]) {
     struct msgbuf rbuf;
     int duration = get_duration();
 
-    printf("duration %d!\n", duration);
+    printf("user: duration: %d\n", duration);
 
     int qid = atoi(argv[QID_IDX]);
 
-    printf("user: qid: %d\n", qid);
-    printf("user: waiting to rcv\n");
+    printf("user: waiting to rcv msg\n");
     if (msgrcv(qid, &rbuf, sizeof(rbuf.clock), 1, 0) < 0) {
         perror("user: msgrcv");
         exit(1);
@@ -31,8 +30,7 @@ int main (int argc, char *argv[]) {
     /*
      * Print the answer.
      */
-    printf("user: received msg\n");
-    printf("user: msg rcv: %d:%d\n", rbuf.clock.seconds, rbuf.clock.nanoseconds);
+    printf("user: read clock: %d:%d\n", rbuf.clock.seconds, rbuf.clock.nanoseconds);
 
     // Need access to shared clock
 
