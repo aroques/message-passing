@@ -22,7 +22,6 @@ int main (int argc, char *argv[]) {
     }
     int proc_count = 0;                // Number of concurrent children
     pid_t childpid;
-    key_t key = 1234;
 
     struct msgbuf sbuf;
     sbuf.mtype = 1;
@@ -33,7 +32,7 @@ int main (int argc, char *argv[]) {
 
     //int qid = get_shared_memory(key);
 
-    int qid = get_shared_memory(key);
+    int qid = get_shared_memory();
 
     if (qid == -1) {
         perror("msgget");

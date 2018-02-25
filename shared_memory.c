@@ -6,10 +6,10 @@
 
 #include "shared_memory.h"
 
-int get_shared_memory(key_t key) {
+int get_shared_memory() {
     int qid;
 
-    qid = msgget(key, IPC_CREAT | 0666);
+    qid = msgget(IPC_PRIVATE, IPC_CREAT | 0666);
 
     if (qid == -1) {
         perror("msgget");

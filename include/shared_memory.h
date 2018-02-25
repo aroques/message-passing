@@ -13,6 +13,6 @@ struct msgbuf {
     char mtext[MSGSZ];
 };
 
-int get_shared_memory(key_t key);
+int get_shared_memory();
 
 #endif
