@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include "helpers.h"
 
@@ -59,4 +60,16 @@ int parse_cmd_line_args(int argc, char* argv[]) {
 void print_usage() {
     fprintf(stderr, "Usage: master [-n number of consumers]\n");
     exit(0);
+}
+
+
+void set_timer(int duration) {
+    struct itimerval value;
+    value.it_interval.tv_sec = duration;
+    value.it_interval.tv_usec = 0;
+    value.it_value = value.it_interval;
+    if (setitimer(ITIMER_REAL, &value, NULL) == -1) {
+        perror("setitimer");
+        exit(1);
+    }
 }

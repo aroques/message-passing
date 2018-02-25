@@ -16,6 +16,7 @@ void wait_for_all_children();
 char* get_msgqid(int msgqid);
 void add_signal_handlers();
 void handle_sigint(int sig);
+void handle_sigalrm(int sig);
 void cleanup_and_exit();
 
 // Globals used in signal handler
@@ -23,7 +24,7 @@ int msgqid;
 pid_t* childpids;
 
 int main (int argc, char *argv[]) {
-
+    set_timer(TIMER_DURATION);
     add_signal_handlers();
 
     int n = parse_cmd_line_args(argc, argv);
@@ -127,9 +128,21 @@ void add_signal_handlers() {
         perror("sigaction");
         exit(1);
     }
+
+    act.sa_handler = handle_sigalrm; // Signal handler
+    sigemptyset(&act.sa_mask);       // No other signals should be blocked
+    if (sigaction(SIGALRM, &act, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
 }
 
 void handle_sigint(int sig) {
+    printf("\nCaught signal %d\n", sig);
+    cleanup_and_exit();
+}
+
+void handle_sigalrm(int sig) {
     printf("\nCaught signal %d\n", sig);
     cleanup_and_exit();
 }
@@ -139,3 +152,4 @@ void cleanup_and_exit() {
     remove_message_queue(msgqid);
     exit(0);
 }
+
