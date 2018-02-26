@@ -31,16 +31,13 @@ int main (int argc, char *argv[]) {
     if (n == 0) {
         n = 1;
     }
-    int proc_limit = 5;
+    int proc_limit = 2;
     int proc_count = 0;                // Number of concurrent children
     childpids = malloc(sizeof(pid_t) * proc_limit);
     int num_procs_spawned = 0;
+    //struct clock clock;
 
-    struct msgbuf sbuf = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
-
-    // need total processes generated
-    // need total time elapsed (timer)
-
+    struct msgbuf msgbuf = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
     msgqid = get_message_queue();
 
     char* execv_arr[EXECV_SIZE];
@@ -48,12 +45,35 @@ int main (int argc, char *argv[]) {
     execv_arr[EXECV_SIZE - 1] = NULL;
 
     int i;
-    for (i = 0; i < proc_limit; i++) {
-
-        if (proc_count == proc_limit) {
+    for (i = 0; i < 2; i++) {
+        printf("oss : i: %d\n", i);
+        if (proc_count > 0) {
+            sleep(1);
+            send_message(msgqid, &msgbuf);
+            printf("oss : sent message: proc_count: %d\n", proc_count);
+            sleep(1);
             // Wait for one child to finish and decrement proc_count
-            wait(NULL);
-            proc_count -= 1;
+//            wait(NULL);
+//            proc_count -= 1;
+
+            // once certain number of children have been forked
+            // wait for message
+
+            receive_message(msgqid, &msgbuf);
+            //clock.seconds = msgbuf.clock.seconds;
+            //clock.nanoseconds = msgbuf.clock.nanoseconds;
+            printf("oss : child exited. time elapsed %d:%d\n", msgbuf.clock.seconds, msgbuf.clock.nanoseconds);
+            break;
+            // output contents of that message to a file
+
+            // critical section to add 100 to the clock
+
+            // send
+
+            // then fork off another child
+
+            // continue until 2 seconds have past (in simulated system)
+            // OR 100 processes in total have been forked off
         }
 
         if ((childpids[i] = fork()) == 0) {
@@ -82,19 +102,10 @@ int main (int argc, char *argv[]) {
             proc_count -= 1;
         }
 
-        if (msgsnd(msgqid, &sbuf, sizeof(sbuf.clock), IPC_NOWAIT) < 0) {
-            printf("%d, %ld, %d:%d, %lu\n", msgqid, sbuf.mtype, sbuf.clock.seconds, sbuf.clock.nanoseconds, sizeof(sbuf.clock));
-            perror("msgsnd");
-            exit(1);
-        }
-       else {
-           printf("oss : wrote to clock: %d:%d \n", sbuf.clock.seconds, sbuf.clock.nanoseconds);
-       }
-
     }
 
-    sleep(5);
 
+    sleep(3);
     cleanup_and_exit();
 
     return 0;

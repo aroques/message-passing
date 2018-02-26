@@ -13,5 +13,7 @@ struct msgbuf {
 
 int get_message_queue();
 void remove_message_queue(int msgqid);
+void receive_message(int msgqid, struct msgbuf* rbuf);
+void send_message(int msgqid, struct msgbuf* sbuf);
 
 #endif

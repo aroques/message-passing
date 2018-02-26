@@ -26,3 +26,19 @@ void remove_message_queue(int msgqid) {
     }
 }
 
+void receive_message(int msgqid, struct msgbuf* rbuf) {
+    if (msgrcv(msgqid, rbuf, sizeof(rbuf->clock), 1, 0) == -1) {
+        perror("msgrcv");
+        exit(1);
+    }
+}
+
+void send_message(int msgqid, struct msgbuf* sbuf) {
+    if (msgsnd(msgqid, sbuf, sizeof(sbuf->clock), IPC_NOWAIT) < 0) {
+        printf("%d, %ld, %d:%d, %lu\n", msgqid, sbuf->mtype, sbuf->clock.seconds, sbuf->clock.nanoseconds, sizeof(sbuf->clock));
+        perror("msgsnd");
+        exit(1);
+    }
+}
+
+

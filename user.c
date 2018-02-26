@@ -5,6 +5,7 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include "global_constants.h"
 #include "helpers.h"
@@ -13,24 +14,50 @@
 int get_duration();
 
 int main (int argc, char *argv[]) {
+    struct timeval  tv_start, tv_stop;
     srand(time(NULL)); // Only seed once
    
-    struct msgbuf rbuf;
+    struct msgbuf msgbuf;
     int duration = get_duration();
+    int time_incremented = 0;
+    int msgqid = atoi(argv[MSGQ_ID_IDX]);
+    int new_nano = 0;
+    int diffsec = 0, diffusec = 0, diffnano = 0;
 
-    printf("user: duration: %d\n", duration);
+    printf("user: waiting on message\n");
 
-    int msgq_id = atoi(argv[MSGQ_ID_IDX]);
+    // Receive
+    receive_message(msgqid, &msgbuf);
+    struct clock clock = { .seconds = msgbuf.clock.seconds, .nanoseconds = msgbuf.clock.nanoseconds };
+    printf("user: read clock: %d:%d\n", msgbuf.clock.seconds, msgbuf.clock.nanoseconds);
+    // Critical Section
+    while(1) {
+        gettimeofday(&tv_start, NULL);
 
-    printf("user: waiting to rcv msg\n");
-    if (msgrcv(msgq_id, &rbuf, sizeof(rbuf.clock), 1, 0) < 0) {
-        perror("user: msgrcv");
-        exit(1);
+        gettimeofday(&tv_stop, NULL);
+        diffsec = tv_stop.tv_sec - tv_start.tv_sec;
+        diffusec = tv_stop.tv_usec - tv_start.tv_usec;
+        diffnano = diffusec * 1000;
+        new_nano = diffnano + clock.nanoseconds;
+
+        time_incremented += new_nano;
+
+        //printf("user: diffsec: %d, diffnano: %d\n", diffsec, diffnano);
+        //printf("user: diffsec: %d, new_nano: %d\n", diffsec, new_nano);
+
+        // Send
+        if (time_incremented > duration) {
+            printf("user: diffsec: %d\n", diffsec);
+            // terminate and send message to master
+            printf("user: incrementing clock nanoseconds by: %dns\n", duration);
+            msgbuf.clock.nanoseconds += duration;
+            printf("user: msgbuf.clock.nanoseconds: %d\n", msgbuf.clock.nanoseconds);
+            send_message(msgqid, &msgbuf);
+            sleep(1);
+            break;
+        }
     }
-
-
-    printf("user: read clock: %d:%d\n", rbuf.clock.seconds, rbuf.clock.nanoseconds);
-    sleep(3);
+    printf("user: sent message\n");
     return 0;  
 }
 
