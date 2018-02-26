@@ -22,7 +22,7 @@ int main (int argc, char *argv[]) {
     int time_incremented = 0;
     int msgqid = atoi(argv[MSGQ_ID_IDX]);
     int new_nano = 0;
-    int diffsec = 0, diffusec = 0, diffnano = 0;
+    int diffusec = 0, diffnano = 0;
 
     printf("user: waiting on message\n");
 
@@ -35,7 +35,7 @@ int main (int argc, char *argv[]) {
         gettimeofday(&tv_start, NULL);
 
         gettimeofday(&tv_stop, NULL);
-        diffsec = tv_stop.tv_sec - tv_start.tv_sec;
+        //diffsec = tv_stop.tv_sec - tv_start.tv_sec;
         diffusec = tv_stop.tv_usec - tv_start.tv_usec;
         diffnano = diffusec * 1000;
         new_nano = diffnano + clock.nanoseconds;
@@ -47,13 +47,10 @@ int main (int argc, char *argv[]) {
 
         // Send
         if (time_incremented > duration) {
-            printf("user: diffsec: %d\n", diffsec);
             // terminate and send message to master
             printf("user: incrementing clock nanoseconds by: %dns\n", duration);
             msgbuf.clock.nanoseconds += duration;
-            printf("user: msgbuf.clock.nanoseconds: %d\n", msgbuf.clock.nanoseconds);
             send_message(msgqid, &msgbuf);
-            sleep(1);
             break;
         }
     }

@@ -39,6 +39,7 @@ int main (int argc, char *argv[]) {
 
     struct msgbuf msgbuf = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
     msgqid = get_message_queue();
+    send_message(msgqid, &msgbuf);
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
@@ -48,17 +49,13 @@ int main (int argc, char *argv[]) {
     for (i = 0; i < 2; i++) {
         printf("oss : i: %d\n", i);
         if (proc_count > 0) {
-            sleep(1);
-            send_message(msgqid, &msgbuf);
-            printf("oss : sent message: proc_count: %d\n", proc_count);
-            sleep(1);
             // Wait for one child to finish and decrement proc_count
 //            wait(NULL);
 //            proc_count -= 1;
 
             // once certain number of children have been forked
             // wait for message
-
+            sleep(1);
             receive_message(msgqid, &msgbuf);
             //clock.seconds = msgbuf.clock.seconds;
             //clock.nanoseconds = msgbuf.clock.nanoseconds;
@@ -104,8 +101,8 @@ int main (int argc, char *argv[]) {
 
     }
 
+    sleep(1);
 
-    sleep(3);
     cleanup_and_exit();
 
     return 0;
