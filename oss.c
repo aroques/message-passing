@@ -20,7 +20,7 @@ void handle_sigalrm(int sig);
 void cleanup_and_exit();
 
 // Globals used in signal handler
-int simulated_clock_id;
+int simulated_clock_id, termination_log_id;
 pid_t* childpids;
 
 int main (int argc, char *argv[]) {
@@ -39,7 +39,10 @@ int main (int argc, char *argv[]) {
 
     struct sysclock sysclock = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
     simulated_clock_id = get_message_queue();
+    termination_log_id = get_message_queue();
+
     update_clock(simulated_clock_id, &sysclock);
+
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
@@ -77,9 +80,12 @@ int main (int argc, char *argv[]) {
 
         if ((childpids[i] = fork()) == 0) {
             // Child so...
-            char msgq_id[10];
-            sprintf(msgq_id, "%d", simulated_clock_id);
-            execv_arr[MSGQ_ID_IDX] = msgq_id;
+            char sysclock_id[10];
+            char termlog_id[10];
+            sprintf(sysclock_id, "%d", simulated_clock_id);
+            sprintf(termlog_id, "%d", termination_log_id);
+            execv_arr[SYSCLOCK_ID_IDX] = sysclock_id;
+            execv_arr[TERMLOG_ID_IDX] = termlog_id;
 
             execvp(execv_arr[0], execv_arr);
 

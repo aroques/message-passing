@@ -1,8 +1,9 @@
 #ifndef GLOBAL_CONSTANTS_H
 #define GLOBAL_CONSTANTS_H
 
-const int EXECV_SIZE = 3;
-const int MSGQ_ID_IDX = 1;
+const int EXECV_SIZE = 4;
+const int SYSCLOCK_ID_IDX = 1;
+const int TERMLOG_ID_IDX = 2;
 const int USER_RUNTIME = 1000000; // In nano-seconds
 const int TIMER_DURATION = 20;
 

@@ -20,14 +20,15 @@ int main (int argc, char *argv[]) {
     struct sysclock sysclock;
     int duration = get_duration();
     int time_incremented = 0;
-    int msgqid = atoi(argv[MSGQ_ID_IDX]);
+    int sysclock_id = atoi(argv[SYSCLOCK_ID_IDX]);
+    int termlog_id = atoi(argv[TERMLOG_ID_IDX]);
     int new_nano = 0;
     int diffusec = 0, diffnano = 0;
 
     // Critical Section
     while(1) {
         // Receive
-        read_clock(msgqid, &sysclock);
+        read_clock(sysclock_id, &sysclock);
         //struct clock clock = { .seconds = sysclock.clock.seconds, .nanoseconds = sysclock.clock.nanoseconds };
         //printf("user: read clock: %d:%d\n", sysclock.clock.seconds, sysclock.clock.nanoseconds);
 
@@ -55,14 +56,15 @@ int main (int argc, char *argv[]) {
             //printf("user: terminating and incrementing clock nanoseconds by: %dns\n", new_nano);
             //printf("user: incrementing clock nanoseconds by: %dns\n", new_nano);
             sysclock.clock.nanoseconds += new_nano;
-            update_clock(msgqid, &sysclock);
+            update_clock(sysclock_id, &sysclock);
+
             break;
         }
         else {
             //printf("user%d: incrementing clock nanoseconds by: %dns\n", getpid(), new_nano);
             //printf("user%d: clock: %dns\n", getpid(), sysclock.clock.nanoseconds);
             sysclock.clock.nanoseconds += new_nano;
-            update_clock(msgqid, &sysclock);
+            update_clock(sysclock_id, &sysclock);
         }
     }
     printf("user: exiting: duration: %d\n", duration);
