@@ -37,9 +37,9 @@ int main (int argc, char *argv[]) {
     int num_procs_spawned = 0;
     //struct clock clock;
 
-    struct sysclock msgbuf = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
+    struct sysclock sysclock = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
     simulated_clock_id = get_message_queue();
-    update_clock(simulated_clock_id, &msgbuf);
+    update_clock(simulated_clock_id, &sysclock);
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
@@ -53,20 +53,20 @@ int main (int argc, char *argv[]) {
 //            proc_count -= 1;
             // once certain number of children have been forked
             // wait for message
-            //receive_message(msgqid, &msgbuf);
+            //receive_message(msgqid, &sysclock);
 
-            printf("oss : child exited. time elapsed %d:%d\n", msgbuf.clock.seconds, msgbuf.clock.nanoseconds);
+            printf("oss : child exited. time elapsed %d:%d\n", sysclock.clock.seconds, sysclock.clock.nanoseconds);
 
-            msgbuf.clock.nanoseconds += 100;
-            //clock.seconds = msgbuf.clock.seconds;
-            //clock.nanoseconds = msgbuf.clock.nanoseconds;
-            printf("oss : add 100 : time elapsed %d:%d\n", msgbuf.clock.seconds, msgbuf.clock.nanoseconds);
+            sysclock.clock.nanoseconds += 100;
+            //clock.seconds = sysclock.clock.seconds;
+            //clock.nanoseconds = sysclock.clock.nanoseconds;
+            printf("oss : add 100 : time elapsed %d:%d\n", sysclock.clock.seconds, sysclock.clock.nanoseconds);
             // output contents of that message to a file
 
             // critical section to add 100 to the clock
 
             // send
-            update_clock(simulated_clock_id, &msgbuf);
+            update_clock(simulated_clock_id, &sysclock);
             // then fork off another child
             // continue until 2 seconds have past (in simulated system)
             // OR 100 processes in total have been forked off

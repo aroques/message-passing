@@ -17,7 +17,7 @@ int main (int argc, char *argv[]) {
     struct timeval  tv_start, tv_stop;
     srand(time(NULL)); // Only seed once
    
-    struct sysclock msgbuf;
+    struct sysclock sysclock;
     int duration = get_duration();
     int time_incremented = 0;
     int msgqid = atoi(argv[MSGQ_ID_IDX]);
@@ -27,9 +27,9 @@ int main (int argc, char *argv[]) {
     // Critical Section
     while(1) {
         // Receive
-        read_clock(msgqid, &msgbuf);
-        //struct clock clock = { .seconds = msgbuf.clock.seconds, .nanoseconds = msgbuf.clock.nanoseconds };
-        //printf("user: read clock: %d:%d\n", msgbuf.clock.seconds, msgbuf.clock.nanoseconds);
+        read_clock(msgqid, &sysclock);
+        //struct clock clock = { .seconds = sysclock.clock.seconds, .nanoseconds = sysclock.clock.nanoseconds };
+        //printf("user: read clock: %d:%d\n", sysclock.clock.seconds, sysclock.clock.nanoseconds);
 
         gettimeofday(&tv_start, NULL);
 
@@ -54,19 +54,19 @@ int main (int argc, char *argv[]) {
             new_nano = duration - time_incremented;
             //printf("user: terminating and incrementing clock nanoseconds by: %dns\n", new_nano);
             //printf("user: incrementing clock nanoseconds by: %dns\n", new_nano);
-            msgbuf.clock.nanoseconds += new_nano;
-            update_clock(msgqid, &msgbuf);
+            sysclock.clock.nanoseconds += new_nano;
+            update_clock(msgqid, &sysclock);
             break;
         }
         else {
             //printf("user%d: incrementing clock nanoseconds by: %dns\n", getpid(), new_nano);
-            //printf("user%d: clock: %dns\n", getpid(), msgbuf.clock.nanoseconds);
-            msgbuf.clock.nanoseconds += new_nano;
-            update_clock(msgqid, &msgbuf);
+            //printf("user%d: clock: %dns\n", getpid(), sysclock.clock.nanoseconds);
+            sysclock.clock.nanoseconds += new_nano;
+            update_clock(msgqid, &sysclock);
         }
     }
     printf("user: exiting: duration: %d\n", duration);
-    printf("user: simulated system clock: %d\n", msgbuf.clock.nanoseconds);
+    printf("user: simulated system clock: %d\n", sysclock.clock.nanoseconds);
     return 0;  
 }
 
