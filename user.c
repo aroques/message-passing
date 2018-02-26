@@ -17,7 +17,7 @@ int main (int argc, char *argv[]) {
     struct timeval  tv_start, tv_stop;
     srand(time(NULL)); // Only seed once
    
-    struct msgbuf msgbuf;
+    struct sysclock msgbuf;
     int duration = get_duration();
     int time_incremented = 0;
     int msgqid = atoi(argv[MSGQ_ID_IDX]);
@@ -27,7 +27,7 @@ int main (int argc, char *argv[]) {
     // Critical Section
     while(1) {
         // Receive
-        receive_message(msgqid, &msgbuf);
+        read_clock(msgqid, &msgbuf);
         //struct clock clock = { .seconds = msgbuf.clock.seconds, .nanoseconds = msgbuf.clock.nanoseconds };
         //printf("user: read clock: %d:%d\n", msgbuf.clock.seconds, msgbuf.clock.nanoseconds);
 
@@ -55,14 +55,14 @@ int main (int argc, char *argv[]) {
             //printf("user: terminating and incrementing clock nanoseconds by: %dns\n", new_nano);
             //printf("user: incrementing clock nanoseconds by: %dns\n", new_nano);
             msgbuf.clock.nanoseconds += new_nano;
-            send_message(msgqid, &msgbuf);
+            update_clock(msgqid, &msgbuf);
             break;
         }
         else {
             //printf("user%d: incrementing clock nanoseconds by: %dns\n", getpid(), new_nano);
             //printf("user%d: clock: %dns\n", getpid(), msgbuf.clock.nanoseconds);
             msgbuf.clock.nanoseconds += new_nano;
-            send_message(msgqid, &msgbuf);
+            update_clock(msgqid, &msgbuf);
         }
     }
     printf("user: exiting: duration: %d\n", duration);

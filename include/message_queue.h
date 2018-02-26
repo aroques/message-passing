@@ -6,7 +6,7 @@ struct clock {
     int nanoseconds;
 };
 
-struct msgbuf {
+struct sysclock {
     long mtype;
     struct clock clock;
 };
@@ -20,7 +20,7 @@ struct termlog {
 
 int get_message_queue();
 void remove_message_queue(int msgqid);
-void receive_message(int msgqid, struct msgbuf* rbuf);
-void send_message(int msgqid, struct msgbuf* sbuf);
+void read_clock(int msgqid, struct sysclock* rbuf);
+void update_clock(int msgqid, struct sysclock* sbuf);
 
 #endif

@@ -37,9 +37,9 @@ int main (int argc, char *argv[]) {
     int num_procs_spawned = 0;
     //struct clock clock;
 
-    struct msgbuf msgbuf = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
+    struct sysclock msgbuf = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
     simulated_clock_id = get_message_queue();
-    send_message(simulated_clock_id, &msgbuf);
+    update_clock(simulated_clock_id, &msgbuf);
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
@@ -66,7 +66,7 @@ int main (int argc, char *argv[]) {
             // critical section to add 100 to the clock
 
             // send
-            send_message(simulated_clock_id, &msgbuf);
+            update_clock(simulated_clock_id, &msgbuf);
             // then fork off another child
             // continue until 2 seconds have past (in simulated system)
             // OR 100 processes in total have been forked off
