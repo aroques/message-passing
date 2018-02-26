@@ -20,7 +20,7 @@ void handle_sigalrm(int sig);
 void cleanup_and_exit();
 
 // Globals used in signal handler
-int msgqid;
+int simulated_clock_id;
 pid_t* childpids;
 
 int main (int argc, char *argv[]) {
@@ -31,52 +31,54 @@ int main (int argc, char *argv[]) {
     if (n == 0) {
         n = 1;
     }
-    int proc_limit = 2;
+    int proc_limit = 5;
     int proc_count = 0;                // Number of concurrent children
-    childpids = malloc(sizeof(pid_t) * proc_limit);
+    childpids = malloc(sizeof(pid_t) * 100);
     int num_procs_spawned = 0;
     //struct clock clock;
 
     struct msgbuf msgbuf = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
-    msgqid = get_message_queue();
-    send_message(msgqid, &msgbuf);
+    simulated_clock_id = get_message_queue();
+    send_message(simulated_clock_id, &msgbuf);
 
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
     execv_arr[EXECV_SIZE - 1] = NULL;
 
-    int i;
-    for (i = 0; i < 2; i++) {
-        printf("oss : i: %d\n", i);
-        if (proc_count > 0) {
+    int i = 0;
+    while( i < 100) {
+        if (proc_count == proc_limit) {
             // Wait for one child to finish and decrement proc_count
 //            wait(NULL);
 //            proc_count -= 1;
-
             // once certain number of children have been forked
             // wait for message
-            sleep(1);
-            receive_message(msgqid, &msgbuf);
+            //receive_message(msgqid, &msgbuf);
+
+            printf("oss : child exited. time elapsed %d:%d\n", msgbuf.clock.seconds, msgbuf.clock.nanoseconds);
+
+            msgbuf.clock.nanoseconds += 100;
             //clock.seconds = msgbuf.clock.seconds;
             //clock.nanoseconds = msgbuf.clock.nanoseconds;
-            printf("oss : child exited. time elapsed %d:%d\n", msgbuf.clock.seconds, msgbuf.clock.nanoseconds);
-            break;
+            printf("oss : add 100 : time elapsed %d:%d\n", msgbuf.clock.seconds, msgbuf.clock.nanoseconds);
             // output contents of that message to a file
 
             // critical section to add 100 to the clock
 
             // send
-
+            send_message(simulated_clock_id, &msgbuf);
             // then fork off another child
-
             // continue until 2 seconds have past (in simulated system)
             // OR 100 processes in total have been forked off
+            if (num_procs_spawned == 50) {
+                break;
+            }
         }
 
         if ((childpids[i] = fork()) == 0) {
             // Child so...
             char msgq_id[10];
-            sprintf(msgq_id, "%d", msgqid);
+            sprintf(msgq_id, "%d", simulated_clock_id);
             execv_arr[MSGQ_ID_IDX] = msgq_id;
 
             execvp(execv_arr[0], execv_arr);
@@ -98,10 +100,9 @@ int main (int argc, char *argv[]) {
             // A child has finished executing
             proc_count -= 1;
         }
-
+        i += 1;
+        sleep(1);
     }
-
-    sleep(1);
 
     cleanup_and_exit();
 
@@ -157,7 +158,7 @@ void handle_sigalrm(int sig) {
 
 void cleanup_and_exit() {
     terminate_children();
-    remove_message_queue(msgqid);
+    remove_message_queue(simulated_clock_id);
     exit(0);
 }
 
