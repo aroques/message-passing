@@ -41,7 +41,7 @@ int main (int argc, char* argv[]) {
     childpids = malloc(sizeof(pid_t) * TOTAL_PROC_LIMIT);
     int num_procs_spawned = 0;  // Total number of children spawned
 
-    if ((fp = fopen("./oss.log", "w")) == NULL) {
+    if ((fp = fopen(cmd_ln_args.filename, "w")) == NULL) {
         perror("fopen");
         exit(1);
     }
