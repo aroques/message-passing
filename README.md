@@ -6,11 +6,11 @@ Each child user process will run for a random duration and during that time will
 
 The program (by default) will generate a log file called oss.log.
 
-Possible command line arguments are:
--h [help]
--s x
--l filename
--t z
+Possible command line arguments are:  
+-h [help]  
+-s x  
+-l filename  
+-t z  
 where x is the maximum number of slave processes spawned (default 5) and filename is the log file used. The parameter z is the time in seconds when the master will terminate itself and all children (default 20).
 
 To build this program run:
