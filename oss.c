@@ -48,7 +48,6 @@ int main (int argc, char *argv[]) {
 
     update_clock(simulated_clock_id, &sysclock);
 
-
     char* execv_arr[EXECV_SIZE];
     execv_arr[0] = "./user";
     execv_arr[EXECV_SIZE - 1] = NULL;
@@ -86,7 +85,7 @@ int main (int argc, char *argv[]) {
 
     }
 
-    printf("Master: Exiting because 100 processes have been spawned or because two seconds have been passed\n");
+    printf("Master: Exiting because 100 processes have been spawned or because two simulated clock seconds have been passed\n");
     printf("Master: Simulated clock time: %d:%'d\n",
             sysclock.clock.seconds, sysclock.clock.nanoseconds);
     printf("Master: %d processes spawned\n", num_procs_spawned);
@@ -167,6 +166,7 @@ void handle_sigint(int sig) {
 
 void handle_sigalrm(int sig) {
     printf("\nMaster: Caught SIGALRM signal %d\n", sig);
+    printf("\nMaster: Timer duration: %d\n", TIMER_DURATION);
     if (!cleaning_up) {
         cleaning_up = 1;
         cleanup_and_exit();
