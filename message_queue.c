@@ -57,9 +57,9 @@ void update_termlog(int msgqid, struct termlog* sbuf) {
 }
 
 void increment_sysclock(struct sysclock* sysclock, int increment) {
-    const float ONE_BILLION = 1000000000;
+    const int ONE_BILLION = 1000000000;
     sysclock->clock.nanoseconds += increment;
-    if ( (sysclock->clock.nanoseconds / ONE_BILLION) >= 1.0) {
+    if (sysclock->clock.nanoseconds >= ONE_BILLION) {
         sysclock->clock.seconds += 1;
         sysclock->clock.nanoseconds -= ONE_BILLION;
     }
