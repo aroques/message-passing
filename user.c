@@ -16,7 +16,6 @@ int get_duration();
 
 int main (int argc, char *argv[]) {
     srand(time(NULL) ^ getpid());
-    setlocale(LC_NUMERIC, "");
     // Used to calculate work/time per round
     struct timeval  tv_start, tv_stop;
     int diffusec = 0, diffnano = 0;

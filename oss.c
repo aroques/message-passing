@@ -30,7 +30,7 @@ int main (int argc, char *argv[]) {
     set_timer(TIMER_DURATION);
     add_signal_handlers();
 
-    setlocale(LC_NUMERIC, "");
+    setlocale(LC_NUMERIC, "");  // For comma separated integers in printf
 
     int n = parse_cmd_line_args(argc, argv);
     if (n == 0) {
@@ -95,8 +95,8 @@ int main (int argc, char *argv[]) {
 
 }
 
-void fork_child(char** execv_arr, int num_procs_spawned) {
-    if ((childpids[num_procs_spawned] = fork()) == 0) {
+void fork_child(char** execv_arr, int idx) {
+    if ((childpids[idx] = fork()) == 0) {
         // Child so...
         char sysclock_id[10];
         char termlog_id[10];
@@ -111,7 +111,7 @@ void fork_child(char** execv_arr, int num_procs_spawned) {
         exit(1);
     }
 
-    if (childpids[num_procs_spawned] == -1) {
+    if (childpids[idx] == -1) {
         perror("Child failed to fork!\n");
         exit(1);
     }
