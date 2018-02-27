@@ -25,6 +25,7 @@ void fork_child(char** execv_arr, int num_procs_spawned);
 int simulated_clock_id, termination_log_id;
 int cleaning_up = 0;
 pid_t* childpids;
+FILE *fp;
 
 int main (int argc, char *argv[]) {
     set_timer(TIMER_DURATION);
@@ -40,6 +41,12 @@ int main (int argc, char *argv[]) {
     int proc_count = 0;                // Number of concurrent children
     childpids = malloc(sizeof(pid_t) * TOTAL_PROC_LIMIT);
     int num_procs_spawned = 0;
+
+
+    if ((fp = fopen("./oss.log", "w")) == NULL) {
+        perror("fopen");
+        exit(1);
+    }
 
     struct sysclock sysclock = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
     struct termlog termlog;
@@ -68,12 +75,19 @@ int main (int argc, char *argv[]) {
                     termlog.pid, sysclock.clock.seconds, sysclock.clock.nanoseconds,
                     termlog.termtime.seconds, termlog.termtime.nanoseconds,
                     0, termlog.duration);
+            fprintf(fp, "Master: Child pid %d is terminating at my time %d:%'d because it reached %d:%'d, which lived for time %d:%'d\n",
+                    termlog.pid, sysclock.clock.seconds, sysclock.clock.nanoseconds,
+                    termlog.termtime.seconds, termlog.termtime.nanoseconds,
+                    0, termlog.duration);
             proc_count -= 1;
 
             increment_sysclock(&sysclock, 100);
 
             fork_child(execv_arr, num_procs_spawned);
             printf("Master: Creating new child pid %d at my time %d:%'d\n",
+                                childpids[num_procs_spawned],
+                                sysclock.clock.seconds, sysclock.clock.nanoseconds);
+            fprintf(fp, "Master: Creating new child pid %d at my time %d:%'d\n",
                                 childpids[num_procs_spawned],
                                 sysclock.clock.seconds, sysclock.clock.nanoseconds);
             proc_count += 1;
@@ -89,6 +103,10 @@ int main (int argc, char *argv[]) {
     printf("Master: Simulated clock time: %d:%'d\n",
             sysclock.clock.seconds, sysclock.clock.nanoseconds);
     printf("Master: %d processes spawned\n", num_procs_spawned);
+    fprintf(fp, "Master: Exiting because 100 processes have been spawned or because two simulated clock seconds have been passed\n");
+    fprintf(fp, "Master: Simulated clock time: %d:%'d\n",
+            sysclock.clock.seconds, sysclock.clock.nanoseconds);
+    fprintf(fp, "Master: %d processes spawned\n", num_procs_spawned);
     cleanup_and_exit();
 
     return 0;
@@ -120,11 +138,13 @@ void fork_child(char** execv_arr, int idx) {
 void wait_for_all_children() {
     pid_t childpid;
     printf("Master: Waiting for all children to exit\n");
+    fprintf(fp, "Master: Waiting for all children to exit\n");
     while  ( (childpid = wait(NULL) ) > 0);
 }
 
 void terminate_children() {
     printf("Master: Sending SIGTERM to all children\n");
+    fprintf(fp, "Master: Sending SIGTERM to all children\n");
     int length = sizeof(childpids)/sizeof(childpids[0]);
     int i;
     for (i = 0; i < length; i++) {
@@ -158,6 +178,7 @@ void add_signal_handlers() {
 
 void handle_sigint(int sig) {
     printf("\nMaster: Caught SIGINT signal %d\n", sig);
+    fprintf(fp, "\nMaster: Caught SIGINT signal %d\n", sig);
     if (!cleaning_up) {
         cleaning_up = 1;
         cleanup_and_exit();
@@ -166,7 +187,9 @@ void handle_sigint(int sig) {
 
 void handle_sigalrm(int sig) {
     printf("\nMaster: Caught SIGALRM signal %d\n", sig);
-    printf("\nMaster: Timer duration: %d\n", TIMER_DURATION);
+    printf("Master: Timer duration: %d\n", TIMER_DURATION);
+    fprintf(fp, "\nMaster: Caught SIGALRM signal %d\n", sig);
+    fprintf(fp, "Master: Timer duration: %d\n", TIMER_DURATION);
     if (!cleaning_up) {
         cleaning_up = 1;
         cleanup_and_exit();
@@ -178,8 +201,10 @@ void cleanup_and_exit() {
     terminate_children();
     wait_for_all_children();
     printf("Master: Removing message queues\n");
+    fprintf(fp, "Master: Removing message queues\n");
     remove_message_queue(simulated_clock_id);
     remove_message_queue(termination_log_id);
+    fclose(fp);
     exit(0);
 }
 
