@@ -39,26 +39,39 @@ char* get_timestamp() {
     return timestamp;
 }
 
-int parse_cmd_line_args(int argc, char* argv[]) {
-    int n = 0;
+struct CmdLnArgs parse_cmd_line_args(int argc, char* argv[]) {
+    int s, t = 0;
+    char* l = NULL;
 
     int option;
-    while ((option = getopt (argc, argv, "n:h")) != -1)
+    while ((option = getopt (argc, argv, "s:l:t:h")) != -1)
     switch (option) {
         case 'h':
             print_usage();
             break;
-        case 'n':
-            n = atoi(optarg);
+        case 's':
+            s = atoi(optarg);
+            break;
+        case 'l':
+            l = optarg;
+            break;
+        case 't':
+            t = atoi(optarg);
             break;
         default:
             print_usage();
     }
-    return n;
+
+    struct CmdLnArgs cmd_ln_args;
+    cmd_ln_args.max_concurrent_slaves = s;
+    cmd_ln_args.filename = l;
+    cmd_ln_args.max_runtime = t;
+
+    return cmd_ln_args;
 }
 
 void print_usage() {
-    fprintf(stderr, "Usage: master [-n number of consumers]\n");
+    fprintf(stderr, "Usage: oss [-s max number concurrent slaves] [-l output filename] [-t seconds before program termination]\n");
     exit(0);
 }
 

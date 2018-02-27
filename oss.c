@@ -20,28 +20,26 @@ void handle_sigint(int sig);
 void handle_sigalrm(int sig);
 void cleanup_and_exit();
 void fork_child(char** execv_arr, int num_procs_spawned);
+struct CmdLnArgs get_cmd_ln_args(int argc, char* argv[]);
 
 // Globals used in signal handler
 int simulated_clock_id, termination_log_id;
 int cleaning_up = 0;
 pid_t* childpids;
-FILE *fp;
+FILE* fp;
 
-int main (int argc, char *argv[]) {
-    set_timer(TIMER_DURATION);
+int main (int argc, char* argv[]) {
+    struct CmdLnArgs cmd_ln_args = get_cmd_ln_args(argc, argv);
+
+    set_timer(cmd_ln_args.max_runtime);
     add_signal_handlers();
 
     setlocale(LC_NUMERIC, "");  // For comma separated integers in printf
 
-    int n = parse_cmd_line_args(argc, argv);
-    if (n == 0) {
-        n = 1;
-    }
-    int proc_limit = 5;
-    int proc_count = 0;                // Number of concurrent children
+    int proc_limit = cmd_ln_args.max_concurrent_slaves;
+    int proc_count = 0; // Number of concurrent children
     childpids = malloc(sizeof(pid_t) * TOTAL_PROC_LIMIT);
-    int num_procs_spawned = 0;
-
+    int num_procs_spawned = 0;  // Total number of children spawned
 
     if ((fp = fopen("./oss.log", "w")) == NULL) {
         perror("fopen");
@@ -111,6 +109,21 @@ int main (int argc, char *argv[]) {
 
     return 0;
 
+}
+
+struct CmdLnArgs get_cmd_ln_args(int argc, char* argv[]) {
+    struct CmdLnArgs cmd_ln_args = parse_cmd_line_args(argc, argv);
+    // Default values if they have not been provided
+    if (cmd_ln_args.max_concurrent_slaves == 0) {
+        cmd_ln_args.max_concurrent_slaves = 5;
+    }
+    if (cmd_ln_args.filename == NULL) {
+        cmd_ln_args.filename = "./oss.log";
+    }
+    if (cmd_ln_args.max_runtime == 0) {
+        cmd_ln_args.max_runtime = 20;
+    }
+    return cmd_ln_args;
 }
 
 void fork_child(char** execv_arr, int idx) {
@@ -187,9 +200,7 @@ void handle_sigint(int sig) {
 
 void handle_sigalrm(int sig) {
     printf("\nMaster: Caught SIGALRM signal %d\n", sig);
-    printf("Master: Timer duration: %d\n", TIMER_DURATION);
     fprintf(fp, "\nMaster: Caught SIGALRM signal %d\n", sig);
-    fprintf(fp, "Master: Timer duration: %d\n", TIMER_DURATION);
     if (!cleaning_up) {
         cleaning_up = 1;
         cleanup_and_exit();
