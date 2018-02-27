@@ -7,6 +7,7 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <string.h>
+#include <locale.h>
 
 #include "global_constants.h"
 #include "helpers.h"
@@ -18,14 +19,18 @@ void add_signal_handlers();
 void handle_sigint(int sig);
 void handle_sigalrm(int sig);
 void cleanup_and_exit();
+void fork_child(char** execv_arr, int num_procs_spawned);
 
 // Globals used in signal handler
 int simulated_clock_id, termination_log_id;
+int cleaning_up = 0;
 pid_t* childpids;
 
 int main (int argc, char *argv[]) {
     set_timer(TIMER_DURATION);
     add_signal_handlers();
+
+    setlocale(LC_NUMERIC, "");
 
     int n = parse_cmd_line_args(argc, argv);
     if (n == 0) {
@@ -33,11 +38,11 @@ int main (int argc, char *argv[]) {
     }
     int proc_limit = 5;
     int proc_count = 0;                // Number of concurrent children
-    childpids = malloc(sizeof(pid_t) * 100);
+    childpids = malloc(sizeof(pid_t) * TOTAL_PROC_LIMIT);
     int num_procs_spawned = 0;
-    //struct clock clock;
 
     struct sysclock sysclock = {.mtype = 1, .clock.seconds = 0, .clock.nanoseconds = 0};
+    struct termlog termlog;
     simulated_clock_id = get_message_queue();
     termination_log_id = get_message_queue();
 
@@ -48,87 +53,87 @@ int main (int argc, char *argv[]) {
     execv_arr[0] = "./user";
     execv_arr[EXECV_SIZE - 1] = NULL;
 
-    int i = 0;
-    while( i < 100) {
-        if (proc_count == proc_limit) {
-            // Wait for one child to finish and decrement proc_count
-//            wait(NULL);
-//            proc_count -= 1;
-            // once certain number of children have been forked
-            // wait for message
-            //receive_message(msgqid, &sysclock);
-
-            printf("oss : child exited. time elapsed %d:%d\n", sysclock.clock.seconds, sysclock.clock.nanoseconds);
-
-            sysclock.clock.nanoseconds += 100;
-            //clock.seconds = sysclock.clock.seconds;
-            //clock.nanoseconds = sysclock.clock.nanoseconds;
-            printf("oss : add 100 : time elapsed %d:%d\n", sysclock.clock.seconds, sysclock.clock.nanoseconds);
-            // output contents of that message to a file
-
-            // critical section to add 100 to the clock
-
-            // send
-            update_clock(simulated_clock_id, &sysclock);
-            // then fork off another child
-            // continue until 2 seconds have past (in simulated system)
-            // OR 100 processes in total have been forked off
-            if (num_procs_spawned == 50) {
-                break;
-            }
-        }
-
-        if ((childpids[i] = fork()) == 0) {
-            // Child so...
-            char sysclock_id[10];
-            char termlog_id[10];
-            sprintf(sysclock_id, "%d", simulated_clock_id);
-            sprintf(termlog_id, "%d", termination_log_id);
-            execv_arr[SYSCLOCK_ID_IDX] = sysclock_id;
-            execv_arr[TERMLOG_ID_IDX] = termlog_id;
-
-            execvp(execv_arr[0], execv_arr);
-
-            perror("Child failed to execvp the command!");
-            return 1;
-        }
-
-        if (childpids[i] == -1) {
-            perror("Child failed to fork!\n");
-            return 1;
-        }
-
-        // Increment because we forked
+    for (num_procs_spawned = 0; num_procs_spawned < proc_limit; num_procs_spawned++) {
+        fork_child(execv_arr, num_procs_spawned);
         proc_count += 1;
-        num_procs_spawned += 1;
-
-        if (waitpid(-1, NULL, WNOHANG) > 0) {
-            // A child has finished executing
-            proc_count -= 1;
-        }
-        i += 1;
-        sleep(1);
     }
 
+    while ( (num_procs_spawned < TOTAL_PROC_LIMIT) && (sysclock.clock.seconds < 2) ) {
+
+        if (proc_count == proc_limit) {
+            // Receive
+            read_termlog(termination_log_id, &termlog);
+            read_clock(simulated_clock_id, &sysclock);
+
+            printf("Master: Child pid %d is terminating at my time %d:%'d because it reached %d:%'d, which lived for time %d:%'d\n",
+                    termlog.pid, sysclock.clock.seconds, sysclock.clock.nanoseconds,
+                    termlog.termtime.seconds, termlog.termtime.nanoseconds,
+                    0, termlog.duration);
+            proc_count -= 1;
+
+            increment_sysclock(&sysclock, 100);
+
+            fork_child(execv_arr, num_procs_spawned);
+            printf("Master: Creating new child pid %d at my time %d:%'d\n",
+                                childpids[num_procs_spawned],
+                                sysclock.clock.seconds, sysclock.clock.nanoseconds);
+            proc_count += 1;
+            num_procs_spawned += 1;
+
+            // Send
+            update_clock(simulated_clock_id, &sysclock);
+        }
+
+    }
+
+    printf("Master: Exiting because 100 processes have been spawned or because two seconds have been passed\n");
+    printf("Master: Simulated clock time: %d:%'d\n",
+            sysclock.clock.seconds, sysclock.clock.nanoseconds);
+    printf("Master: %d processes spawned\n", num_procs_spawned);
     cleanup_and_exit();
 
     return 0;
 
 }
 
-void wait_for_all_children() {
-    pid_t childpid;
-    while  ( (childpid = wait(NULL) ) > 0) {
-        printf("Child exited. pid: %d\n", childpid);
+void fork_child(char** execv_arr, int num_procs_spawned) {
+    if ((childpids[num_procs_spawned] = fork()) == 0) {
+        // Child so...
+        char sysclock_id[10];
+        char termlog_id[10];
+        sprintf(sysclock_id, "%d", simulated_clock_id);
+        sprintf(termlog_id, "%d", termination_log_id);
+        execv_arr[SYSCLOCK_ID_IDX] = sysclock_id;
+        execv_arr[TERMLOG_ID_IDX] = termlog_id;
+
+        execvp(execv_arr[0], execv_arr);
+
+        perror("Child failed to execvp the command!");
+        exit(1);
+    }
+
+    if (childpids[num_procs_spawned] == -1) {
+        perror("Child failed to fork!\n");
+        exit(1);
     }
 }
 
+void wait_for_all_children() {
+    pid_t childpid;
+    printf("Master: Waiting for all children to exit\n");
+    while  ( (childpid = wait(NULL) ) > 0);
+}
+
 void terminate_children() {
+    printf("Master: Sending SIGTERM to all children\n");
     int length = sizeof(childpids)/sizeof(childpids[0]);
     int i;
     for (i = 0; i < length; i++) {
         if (childpids[i] > 0) {
-            kill(childpids[i], SIGTERM);
+            if (kill(childpids[i], SIGTERM) == -1) {
+                perror("kill");
+                exit(1);
+            }
         }
     }
     free(childpids);
@@ -153,18 +158,28 @@ void add_signal_handlers() {
 }
 
 void handle_sigint(int sig) {
-    printf("\nCaught signal %d\n", sig);
-    cleanup_and_exit();
+    printf("\nMaster: Caught SIGINT signal %d\n", sig);
+    if (!cleaning_up) {
+        cleaning_up = 1;
+        cleanup_and_exit();
+    }
 }
 
 void handle_sigalrm(int sig) {
-    printf("\nCaught signal %d\n", sig);
-    cleanup_and_exit();
+    printf("\nMaster: Caught SIGALRM signal %d\n", sig);
+    if (!cleaning_up) {
+        cleaning_up = 1;
+        cleanup_and_exit();
+    }
+
 }
 
 void cleanup_and_exit() {
     terminate_children();
+    wait_for_all_children();
+    printf("Master: Removing message queues\n");
     remove_message_queue(simulated_clock_id);
+    remove_message_queue(termination_log_id);
     exit(0);
 }
 

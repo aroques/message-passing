@@ -22,5 +22,8 @@ int get_message_queue();
 void remove_message_queue(int msgqid);
 void read_clock(int msgqid, struct sysclock* rbuf);
 void update_clock(int msgqid, struct sysclock* sbuf);
+void read_termlog(int msgqid, struct termlog* rbuf);
+void update_termlog(int msgqid, struct termlog* sbuf);
+void increment_sysclock(struct sysclock* sysclock, int increment);
 
 #endif

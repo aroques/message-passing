@@ -6,6 +6,7 @@
 #include <sys/msg.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <locale.h>
 
 #include "global_constants.h"
 #include "helpers.h"
@@ -14,61 +15,69 @@
 int get_duration();
 
 int main (int argc, char *argv[]) {
+    srand(time(NULL));
+    setlocale(LC_NUMERIC, "");
+    // Used to calculate work/time per round
     struct timeval  tv_start, tv_stop;
-    srand(time(NULL)); // Only seed once
-   
-    struct sysclock sysclock;
-    int duration = get_duration();
-    int time_incremented = 0;
-    int sysclock_id = atoi(argv[SYSCLOCK_ID_IDX]);
-    int termlog_id = atoi(argv[TERMLOG_ID_IDX]);
-    int new_nano = 0;
     int diffusec = 0, diffnano = 0;
 
-    // Critical Section
+    // Shared memory structures
+    int sysclock_id = atoi(argv[SYSCLOCK_ID_IDX]);
+    int termlog_id = atoi(argv[TERMLOG_ID_IDX]);
+    struct sysclock sysclock;
+    struct termlog termlog;
+    termlog.mtype = 1;
+
+    // Other variables
+    int duration = get_duration();  // Total duration to run for
+    int time_incremented = 0;       /* Total simulated time that this process has
+                                        incremented simulated clock while running */
+    int new_nano = 0;               // Number of nanoseconds to increment simulated clock
+
     while(1) {
         // Receive
         read_clock(sysclock_id, &sysclock);
-        //struct clock clock = { .seconds = sysclock.clock.seconds, .nanoseconds = sysclock.clock.nanoseconds };
-        //printf("user: read clock: %d:%d\n", sysclock.clock.seconds, sysclock.clock.nanoseconds);
+        // Critical Section
 
+        // Get quantity of work
         gettimeofday(&tv_start, NULL);
-
         gettimeofday(&tv_stop, NULL);
-        //diffsec = tv_stop.tv_sec - tv_start.tv_sec;
+
+        // Calculate nano-seconds to increment sysclock
         diffusec = tv_stop.tv_usec - tv_start.tv_usec;
         diffnano = diffusec * 1000;
         new_nano = diffnano;
 
         time_incremented += new_nano;
 
-        //printf("user: diffsec: %d, diffnano: %d\n", diffsec, diffnano);
-        //printf("user: diffsec: %d, new_nano: %d\n", diffsec, new_nano);
-
         // Send
-        if (time_incremented > duration) {
-            // terminate and send message to master
+        if (time_incremented >= duration) {
+            // Terminate and send message to master
 
-
+            // Calculated corrected new_nano
             time_incremented -= new_nano;
-            // need to add my pid to message, and need to add termination time
             new_nano = duration - time_incremented;
-            //printf("user: terminating and incrementing clock nanoseconds by: %dns\n", new_nano);
-            //printf("user: incrementing clock nanoseconds by: %dns\n", new_nano);
-            sysclock.clock.nanoseconds += new_nano;
-            update_clock(sysclock_id, &sysclock);
 
+            increment_sysclock(&sysclock, new_nano);
+
+            // Set termination log information
+            termlog.termtime.seconds = sysclock.clock.seconds;
+            termlog.termtime.nanoseconds = sysclock.clock.nanoseconds;
+            termlog.pid = getpid();
+            termlog.duration = duration;
+
+            // Send
+            update_clock(sysclock_id, &sysclock);
+            update_termlog(termlog_id, &termlog);
             break;
         }
         else {
-            //printf("user%d: incrementing clock nanoseconds by: %dns\n", getpid(), new_nano);
-            //printf("user%d: clock: %dns\n", getpid(), sysclock.clock.nanoseconds);
-            sysclock.clock.nanoseconds += new_nano;
+            increment_sysclock(&sysclock, new_nano);
+            // Send
             update_clock(sysclock_id, &sysclock);
         }
     }
-    printf("user: exiting: duration: %d\n", duration);
-    printf("user: simulated system clock: %d\n", sysclock.clock.nanoseconds);
+
     return 0;  
 }
 

@@ -33,11 +33,35 @@ void read_clock(int msgqid, struct sysclock* rbuf) {
     }
 }
 
+void read_termlog(int msgqid, struct termlog* rbuf) {
+    if (msgrcv(msgqid, rbuf, sizeof(*rbuf), 1, 0) == -1) {
+        perror("msgrcv");
+        exit(1);
+    }
+}
+
 void update_clock(int msgqid, struct sysclock* sbuf) {
     if (msgsnd(msgqid, sbuf, sizeof(sbuf->clock), IPC_NOWAIT) < 0) {
         printf("%d, %ld, %d:%d, %lu\n", msgqid, sbuf->mtype, sbuf->clock.seconds, sbuf->clock.nanoseconds, sizeof(sbuf->clock));
         perror("msgsnd");
         exit(1);
+    }
+}
+
+void update_termlog(int msgqid, struct termlog* sbuf) {
+
+    if (msgsnd(msgqid, sbuf, sizeof(*sbuf), IPC_NOWAIT) < 0) {
+        perror("msgsnd");
+        exit(1);
+    }
+}
+
+void increment_sysclock(struct sysclock* sysclock, int increment) {
+    const int ONE_BILLION = 1000000000;
+    sysclock->clock.nanoseconds += increment;
+    if ( (sysclock->clock.nanoseconds / ONE_BILLION) >= 1) {
+        sysclock->clock.seconds += 1;
+        sysclock->clock.nanoseconds -= ONE_BILLION;
     }
 }
 
