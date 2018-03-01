@@ -17,8 +17,8 @@ int get_duration();
 int main (int argc, char *argv[]) {
     srand(time(NULL) ^ getpid());
     // Used to calculate work/time per round
-    struct timeval  tv_start, tv_stop;
-    int diffusec = 0, diffnano = 0;
+    struct timeval tv_start, tv_stop;
+    int total_diffusec = 0, total_diffnano = 0;
 
     // Shared memory structures
     int sysclock_id = atoi(argv[SYSCLOCK_ID_IDX]);
@@ -33,19 +33,19 @@ int main (int argc, char *argv[]) {
                                         incremented simulated clock while running */
     int new_nano = 0;               // Number of nanoseconds to increment simulated clock
 
+    gettimeofday(&tv_start, NULL);
     while(1) {
         // Receive
         read_clock(sysclock_id, &sysclock);
         // Critical Section
 
         // Get quantity of work
-        gettimeofday(&tv_start, NULL);
         gettimeofday(&tv_stop, NULL);
 
         // Calculate nano-seconds to increment sysclock
-        diffusec = tv_stop.tv_usec - tv_start.tv_usec;
-        diffnano = diffusec * 1000;
-        new_nano = diffnano;
+        total_diffusec = tv_stop.tv_usec - tv_start.tv_usec;
+        total_diffnano = total_diffusec * 1000;
+        new_nano = total_diffnano - time_incremented;
 
         time_incremented += new_nano;
 

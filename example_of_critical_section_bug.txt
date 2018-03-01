@@ -1,0 +1,104 @@
+Master: Child pid 9391 is terminating at my time 0:6,566,085 because it reached 0:5,304,085, which lived for time 0:889,085
+Master: Creating new child pid 9392 at my time 0:6,566,185
+Master: Child pid 9389 is terminating at my time 0:53,961,225 because it reached 0:53,852,225, which lived for time 0:11,294,040
+Master: Creating new child pid 9393 at my time 0:53,961,325
+Master: Child pid 9388 is terminating at my time 0:102,675,296 because it reached 0:102,267,296, which lived for time 0:20,604,971
+Master: Creating new child pid 9394 at my time 0:102,675,396
+Master: Child pid 9390 is terminating at my time 0:103,480,604 because it reached 0:103,080,604, which lived for time 0:20,565,208
+Master: Creating new child pid 9395 at my time 0:103,480,704
+Master: Child pid 9393 is terminating at my time 0:111,704,566 because it reached 0:109,581,635, which lived for time 0:10,916,931
+Master: Creating new child pid 9396 at my time 0:111,704,666
+Master: Child pid 9392 is terminating at my time 0:112,760,666 because it reached 0:110,009,587, which lived for time 0:20,622,952
+Master: Creating new child pid 9397 at my time 0:112,760,766
+Master: Child pid 9394 is terminating at my time 0:112,927,766 because it reached 0:110,929,566, which lived for time 0:1,421,979
+Master: Creating new child pid 9398 at my time 0:112,927,866
+Master: Child pid 9387 is terminating at my time 0:117,172,847 because it reached 0:115,258,847, which lived for time 0:26,041,981
+Master: Creating new child pid 9399 at my time 0:117,172,947
+Master: Child pid 9399 is terminating at my time 0:185,209,339 because it reached 0:185,078,339, which lived for time 0:12,750,392
+Master: Creating new child pid 9400 at my time 0:185,209,439
+Master: Child pid 9396 is terminating at my time 0:227,959,351 because it reached 0:227,369,351, which lived for time 0:22,438,912
+Master: Creating new child pid 9401 at my time 0:227,959,451
+Master: Child pid 9398 is terminating at my time 0:255,922,559 because it reached 0:255,433,559, which lived for time 0:29,161,108
+Master: Creating new child pid 9402 at my time 0:255,922,659
+Master: Child pid 9397 is terminating at my time 0:267,412,479 because it reached 0:267,293,479, which lived for time 0:30,809,820
+Master: Creating new child pid 9403 at my time 0:267,412,579
+Master: Child pid 9395 is terminating at my time 0:293,235,543 because it reached 0:293,018,543, which lived for time 0:39,749,964
+Master: Creating new child pid 9404 at my time 0:293,235,643
+Master: Child pid 9402 is terminating at my time 0:307,931,424 because it reached 0:305,197,352, which lived for time 0:9,634,709
+Master: Creating new child pid 9405 at my time 0:307,931,524
+Master: Child pid 9401 is terminating at my time 0:311,151,524 because it reached 0:306,466,424, which lived for time 0:16,405,072
+Master: Creating new child pid 9406 at my time 0:311,151,624
+Master: Child pid 9400 is terminating at my time 0:345,305,856 because it reached 0:323,775,081, which lived for time 0:29,162,457
+Master: Creating new child pid 9407 at my time 0:345,305,956
+Master: Child pid 9404 is terminating at my time 0:345,966,956 because it reached 0:327,861,856, which lived for time 0:5,802,775
+Master: Creating new child pid 9408 at my time 0:345,967,056
+Master: Child pid 9407 is terminating at my time 0:376,564,154 because it reached 0:365,707,154, which lived for time 0:5,346,098
+Master: Creating new child pid 9409 at my time 0:376,564,254
+Master: Child pid 9408 is terminating at my time 0:382,730,786 because it reached 0:382,431,786, which lived for time 0:6,960,532
+Master: Creating new child pid 9410 at my time 0:382,730,886
+Master: Child pid 9410 is terminating at my time 0:392,948,142 because it reached 0:392,840,142, which lived for time 0:1,348,256
+Master: Creating new child pid 9411 at my time 0:392,948,242
+Master: Child pid 9403 is terminating at my time 0:407,883,021 because it reached 0:407,736,021, which lived for time 0:32,418,779
+Master: Creating new child pid 9412 at my time 0:407,883,121
+Master: Child pid 9406 is terminating at my time 0:416,217,236 because it reached 0:411,412,236, which lived for time 0:23,461,115
+Master: Creating new child pid 9413 at my time 0:416,217,336
+Master: Child pid 9405 is terminating at my time 0:417,412,746 because it reached 0:416,977,746, which lived for time 0:24,725,410
+Master: Creating new child pid 9414 at my time 0:417,412,846
+Master: Child pid 9414 is terminating at my time 0:435,148,578 because it reached 0:435,012,578, which lived for time 0:2,334,732
+Master: Creating new child pid 9415 at my time 0:435,148,678
+Master: Child pid 9413 is terminating at my time 0:459,665,225 because it reached 0:459,514,225, which lived for time 0:7,757,547
+Master: Creating new child pid 9416 at my time 0:459,665,325
+Master: Child pid 9415 is terminating at my time 0:464,535,705 because it reached 0:464,413,705, which lived for time 0:5,443,380
+Master: Creating new child pid 9417 at my time 0:464,535,805
+Master: Child pid 9411 is terminating at my time 0:500,306,543 because it reached 0:500,158,543, which lived for time 0:22,514,738
+Master: Creating new child pid 9418 at my time 0:500,306,643
+Master: Child pid 9417 is terminating at my time 0:501,613,437 because it reached 0:501,494,437, which lived for time 0:7,067,794
+Master: Creating new child pid 9419 at my time 0:501,613,537
+Master: Child pid 9409 is terminating at my time 0:521,115,122 because it reached 0:511,109,284, which lived for time 0:28,985,747
+Master: Creating new child pid 9420 at my time 0:521,115,222
+Master: Child pid 9416 is terminating at my time 0:521,459,222 because it reached 0:518,472,122, which lived for time 0:11,949,838
+Master: Creating new child pid 9421 at my time 0:521,459,322
+Master: Child pid 9418 is terminating at my time 0:535,154,395 because it reached 0:534,705,395, which lived for time 0:5,673,073
+Master: Creating new child pid 9422 at my time 0:535,154,495
+Master: Child pid 9412 is terminating at my time 0:575,951,220 because it reached 0:559,326,220, which lived for time 0:33,289,725
+Master: Creating new child pid 9423 at my time 0:575,951,320
+Master: Child pid 9421 is terminating at my time 0:630,478,966 because it reached 0:630,321,966, which lived for time 0:22,525,646
+Master: Creating new child pid 9424 at my time 0:630,479,066
+Master: Child pid 9423 is terminating at my time 0:641,905,275 because it reached 0:641,768,275, which lived for time 0:11,584,209
+Master: Creating new child pid 9425 at my time 0:641,905,375
+Master: Child pid 9419 is terminating at my time 0:652,055,743 because it reached 0:650,212,743, which lived for time 0:31,816,368
+Master: Creating new child pid 9426 at my time 0:652,055,843
+Master: Child pid 9420 is terminating at my time 0:656,948,750 because it reached 0:656,777,750, which lived for time 0:29,088,907
+Master: Creating new child pid 9427 at my time 0:656,948,850
+Master: Child pid 9422 is terminating at my time 0:681,394,795 because it reached 0:681,201,795, which lived for time 0:30,966,945
+Master: Creating new child pid 9428 at my time 0:681,394,895
+Master: Child pid 9425 is terminating at my time 0:704,349,662 because it reached 0:702,610,457, which lived for time 0:12,053,562
+Master: Creating new child pid 9429 at my time 0:704,349,762
+Master: Child pid 9427 is terminating at my time 0:704,760,762 because it reached 0:702,799,662, which lived for time 0:8,194,205
+Master: Creating new child pid 9430 at my time 0:704,760,862
+Master: Child pid 9426 is terminating at my time 0:741,886,667 because it reached 0:717,411,667, which lived for time 0:16,161,805
+Master: Creating new child pid 9431 at my time 0:741,886,767
+Master: Child pid 9424 is terminating at my time 0:774,305,227 because it reached 0:774,150,227, which lived for time 0:30,839,460
+Master: Creating new child pid 9432 at my time 0:774,305,327
+Master: Child pid 9430 is terminating at my time 0:850,990,329 because it reached 0:850,836,329, which lived for time 0:29,566,002
+Master: Creating new child pid 9433 at my time 0:850,990,429
+Master: Child pid 9431 is terminating at my time 0:858,522,857 because it reached 0:858,267,857, which lived for time 0:22,480,428
+Master: Creating new child pid 9434 at my time 0:858,522,957
+Master: Child pid 9428 is terminating at my time 0:863,443,562 because it reached 0:862,520,562, which lived for time 0:37,848,605
+Master: Creating new child pid 9435 at my time 0:863,443,662
+Master: Child pid 9429 is terminating at my time 0:864,715,251 because it reached 0:864,056,251, which lived for time 0:33,104,589
+Master: Creating new child pid 9436 at my time 0:864,715,351
+Master: Child pid 9436 is terminating at my time 0:896,656,121 because it reached 0:896,515,121, which lived for time 0:5,872,770
+Master: Creating new child pid 9437 at my time 0:896,656,221
+Master: Child pid 9434 is terminating at my time 5:205,524,534 because it reached 5:205,361,534, which lived for time 0:9,988,017
+Master: Creating new child pid 9438 at my time 5:205,524,634
+Master: Exiting because 100 processes have been spawned or because two simulated clock seconds have been passed
+Master: Simulated clock time: 5:205,524,634
+Master: 52 processes spawned
+Master: Sending SIGTERM to all children
+Master: Waiting for all children to exit
+
+Master: Caught SIGALRM signal 14
+Master: Sending SIGTERM to all children
+
+Is my message queue with a struct setup, right?
