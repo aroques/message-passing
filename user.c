@@ -37,7 +37,7 @@ int main (int argc, char *argv[]) {
     while(1) {
         // Receive
         read_clock(sysclock_id, &sysclock);
-        // Critical Section
+        // Critical Section //
 
         // Get quantity of work
         gettimeofday(&tv_stop, NULL);
@@ -76,7 +76,6 @@ int main (int argc, char *argv[]) {
             update_clock(sysclock_id, &sysclock);
         }
     }
-
     return 0;  
 }
 

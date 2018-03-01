@@ -77,22 +77,24 @@ int main (int argc, char* argv[]) {
                     termlog.pid, sysclock.clock.seconds, sysclock.clock.nanoseconds,
                     termlog.termtime.seconds, termlog.termtime.nanoseconds,
                     0, termlog.duration);
-            proc_count -= 1;
 
             increment_sysclock(&sysclock, 100);
 
             fork_child(execv_arr, num_procs_spawned);
+
             printf("Master: Creating new child pid %d at my time %d:%'d\n",
                                 childpids[num_procs_spawned],
                                 sysclock.clock.seconds, sysclock.clock.nanoseconds);
             fprintf(fp, "Master: Creating new child pid %d at my time %d:%'d\n",
                                 childpids[num_procs_spawned],
                                 sysclock.clock.seconds, sysclock.clock.nanoseconds);
-            proc_count += 1;
-            num_procs_spawned += 1;
-
             // Send
             update_clock(simulated_clock_id, &sysclock);
+
+            num_procs_spawned += 1;
+
+            waitpid(-1, NULL, WNOHANG); // Cleanup any zombies as we go
+            
         }
 
     }
@@ -161,7 +163,8 @@ void terminate_children() {
     int length = sizeof(childpids)/sizeof(childpids[0]);
     int i;
     for (i = 0; i < length; i++) {
-        if (childpids[i] > 0) {
+        if (kill(childpids[i], 0) > -1) {
+            // That process exits
             if (kill(childpids[i], SIGTERM) == -1) {
                 perror("kill");
                 exit(1);
