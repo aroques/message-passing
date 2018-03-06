@@ -36,7 +36,7 @@ make clean
 ### Program Hanging
 This program will randomly hang after oss forks a child and updates the clock that is in shared memory. It hangs as if there are no children processes waiting to receive a message at the clock that is in shared memory. If the program hangs press ctrl-c to interrupt the program and try running it again.  
 
-Below is my git log:
+##Below is my git log:
 
 6ccc75e 2018-03-05 19:08:10 -0600 Add git log and program hanging note to README  
 6c54adc 2018-03-01 15:02:18 -0600 Check if process exists before sending SIGTERM to it  
